@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.example.chat_app_test"
-    compileSdkVersion flutter.compileSdkVersion
+    compileSdkVersion 33
     ndkVersion flutter.ndkVersion
 
     compileOptions {
@@ -45,10 +45,11 @@ android {
         applicationId "com.example.chat_app_test"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion flutter.minSdkVersion
-        targetSdkVersion flutter.targetSdkVersion
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdkVersion 24 //cambio a la version minima por authamolify_cognito
+        targetSdkVersion 33
+        multiDexEnabled true
+        versionCode 1 // se increementa una unidad en cada actualizacion
+        versionName "1.0.0" // version visible para el publico en tiendas 
     }
 
     buildTypes {
