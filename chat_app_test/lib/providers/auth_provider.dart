@@ -2,6 +2,7 @@
 import 'package:chat_app_test/helper/constanst.dart';
 import 'package:chat_app_test/models/user_chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -60,7 +61,17 @@ class AuthProviders extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      User? firebaseUser = (await firebaseAuth..signInWithCredential(authCredential)).currentUser;
+      
+
+      User? firebaseUser = (await firebaseAuth.signInWithCredential(authCredential)).user;
+      final firebaseAuthUser = await firebaseAuth.signInWithCredential(
+        authCredential
+      );
+
+      if(firebaseAuthUser.user!.uid.isNotEmpty){
+        print(firebaseAuthUser);
+      }
+
 
       if(firebaseUser != null){
         //consultamos datos

@@ -11,6 +11,7 @@ class RoutesPages {
     return <String, WidgetBuilder> {
       "home" :(context) => const HomePage(),
       "splash" : (context) => const SplashPage(),
+      "login" :(context) => const LoginPage(),
     };
   }
 
