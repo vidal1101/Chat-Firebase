@@ -60,7 +60,7 @@ class AuthProviders extends ChangeNotifier {
         idToken: googleAuth.idToken,
       );
 
-      User? firebaseUser = (await FirebaseAuth.instance.signInWithCredential(authCredential)).user;
+      User? firebaseUser = (await firebaseAuth..signInWithCredential(authCredential)).currentUser;
 
       if(firebaseUser != null){
         //consultamos datos
