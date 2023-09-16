@@ -4,12 +4,13 @@ import 'package:flutter/material.dart';
 
 class RoutesPages {
 
-  static String initialRoute = "home";
-  static String secondRoute  = "";
+  static String initialRoute = "splash";
+  static String secondRoute  = "home";
 
   static Map<String, WidgetBuilder> getRoutes(){
     return <String, WidgetBuilder> {
       "home" :(context) => const HomePage(),
+      "splash" : (context) => const SplashPage(),
     };
   }
 
