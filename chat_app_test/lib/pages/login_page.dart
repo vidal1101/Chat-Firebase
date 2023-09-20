@@ -41,7 +41,7 @@ class LoginPage extends StatelessWidget {
             onTap: () async{
               bool isSuccess = await authProvider.handleSignIn();
               if(isSuccess){
-                Navigator.pushNamed(context, "home");
+                Navigator.pushReplacementNamed(context, "home");
               }
             },
             child: const Row(

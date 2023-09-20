@@ -25,6 +25,9 @@ class AuthProviders extends ChangeNotifier {
   late final FirebaseStorage firebaseStorage;
   late final SharedPreferences sharedPreferences;
 
+  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+  
+
   Status _status = Status.uninitialized;
 
   Status get status => _status;
