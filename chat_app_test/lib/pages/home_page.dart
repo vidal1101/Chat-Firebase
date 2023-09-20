@@ -1,4 +1,6 @@
 
+import 'dart:convert';
+
 import 'package:chat_app_test/helper/constanst.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
 import 'package:chat_app_test/widgets/loading.dart';
@@ -68,6 +70,7 @@ class _HomePageState extends State<HomePage> {
 
             final data = snapshot.data.docs;
             for (var element in data) {
+              print('Data: ${ jsonEncode(element.data()) }');
               listTemp.add(element.data()['nickname']);
             }
             

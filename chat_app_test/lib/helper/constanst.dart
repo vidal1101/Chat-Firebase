@@ -16,5 +16,10 @@ class FirestoneConstants {
   static const String content = "content";
   static const String type = "type";
 
+  static const String isOnline  = 'isOnline';
+  static const String pushToken   = "pushToken";
+  static const String lastActive  = "lastActive";
+
+
 
 }

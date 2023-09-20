@@ -94,7 +94,12 @@ class AuthProviders extends ChangeNotifier {
             FirestoneConstants.photoUrl : firebaseUser.photoURL, 
             FirestoneConstants.id : firebaseUser.uid, 
             'createdAt' : DateTime.now().millisecondsSinceEpoch.toString(), 
+            //datos extras por agregar. 
+            FirestoneConstants.lastActive : '',
+            FirestoneConstants.isOnline : false , 
+            FirestoneConstants.pushToken : '',
             FirestoneConstants.chattingWith : null,
+
           });
 
           User? currentUser = firebaseUser;
@@ -104,6 +109,11 @@ class AuthProviders extends ChangeNotifier {
           await sharedPreferences.setString(FirestoneConstants.nickName, currentUser.displayName ?? '');
           await sharedPreferences.setString(FirestoneConstants.photoUrl, currentUser.photoURL ?? '');
           await sharedPreferences.setString(FirestoneConstants.phoneNumber, currentUser.phoneNumber ?? ''  );
+          ///
+          // await sharedPreferences.setString(FirestoneConstants.lastActive, currentUser. ?? ''  );
+          // await sharedPreferences.setString(FirestoneConstants.pushToken, currentUser.phoneNumber ?? ''  );
+          // await sharedPreferences.setBool(FirestoneConstants.isOnline, currentUser.phoneNumber ?? ''  );
+
 
 
         }else{
