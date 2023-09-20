@@ -1,5 +1,6 @@
 
 import 'package:chat_app_test/helper/constanst.dart';
+import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:chat_app_test/models/user_chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -26,8 +27,17 @@ class AuthProviders extends ChangeNotifier {
   late final SharedPreferences sharedPreferences;
 
   final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
-  
+  List<ChatUserModel> _listChat = [];
 
+
+  List<ChatUserModel> get listChat => _listChat;
+
+  set listChat(List<ChatUserModel> chatUserModel){
+    _listChat = chatUserModel;
+    notifyListeners();
+  }
+  
+  
   Status _status = Status.uninitialized;
 
   Status get status => _status;

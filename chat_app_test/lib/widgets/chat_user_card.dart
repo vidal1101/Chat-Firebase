@@ -1,8 +1,12 @@
+import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:flutter/material.dart';
 
 
 class ChatUserCard extends StatefulWidget {
-  const ChatUserCard({super.key});
+
+  final ChatUserModel chatUserModel;
+
+  const ChatUserCard({super.key, required this.chatUserModel});
 
   @override
   State<ChatUserCard> createState() => _ChatUserCardState();
@@ -22,12 +26,12 @@ class _ChatUserCardState extends State<ChatUserCard> {
           ///navegaf al chat.
           
         },
-        child:  const  ListTile(
+        child:   ListTile(
           leading: CircleAvatar(
-            backgroundImage: NetworkImage(''),
-            child: Icon(Icons.person),
+            backgroundImage: NetworkImage(widget.chatUserModel.photoUrl),
+            //child: const Icon(Icons.person),
           ),
-          title: Text('Nick name'),
+          title: Text(widget.chatUserModel.nickname),
           subtitle: Text('last message'),
           trailing: Text('12:00pm', 
           style: TextStyle(color: Colors.black54),),

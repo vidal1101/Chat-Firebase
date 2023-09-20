@@ -2,9 +2,11 @@
 import 'dart:convert';
 
 import 'package:chat_app_test/helper/constanst.dart';
+import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
 import 'package:chat_app_test/widgets/loading.dart';
 import 'package:chat_app_test/widgets/widgets.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,28 +19,15 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   
-  String? name ="";
-  String? urlImage  = "";
-
-
+  List<ChatUserModel> listTemp = [];
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero,() {
-      getInfor();
     },);
   }
 
-  void getInfor()async{
-    final authProvider = Provider.of<AuthProviders>(context, listen: false);
-
-     name = await authProvider.sharedPreferences.getString(FirestoneConstants.nickName);
-     urlImage = await authProvider.sharedPreferences.getString(FirestoneConstants.photoUrl);
-     setState(() {
-       
-     });
-  }
 
 
 
@@ -47,7 +36,7 @@ class _HomePageState extends State<HomePage> {
     final authProvider = Provider.of<AuthProviders>(context);
     return  Scaffold(
       appBar: AppBar(
-        title: Text(name.toString()),
+        title: Text(''.toString()),
         actions: [
           IconButton(onPressed: () async{
             final authProvider = Provider.of<AuthProviders>(context, listen: false);
@@ -60,7 +49,6 @@ class _HomePageState extends State<HomePage> {
         stream: authProvider.firebaseFirestore.collection(FirestoneConstants.pathUsercolection).snapshots(),
         //initialData: const [],
         builder: (BuildContext context, AsyncSnapshot snapshot) {
-          final listTemp = [];
 
           if(!snapshot.hasData){
             return const Center(child:LoadingView(),);
@@ -68,22 +56,25 @@ class _HomePageState extends State<HomePage> {
             return const Center(child:LoadingView(),);
           }else{
 
-            final data = snapshot.data.docs;
-            for (var element in data) {
-              print('Data: ${ jsonEncode(element.data()) }');
-              listTemp.add(element.data()['nickname']);
+            final List<DocumentSnapshot> data = snapshot.data.docs;
+
+            listTemp = data.map((e) => ChatUserModel.fromJson( e.data() as Map<String, dynamic>)  ).toList() ?? [];
+            //authProvider.listChat  = listTemp;
+
+            if(listTemp.isNotEmpty){
+              return ListView.builder(
+                physics:const  BouncingScrollPhysics(),
+                itemCount: listTemp.length,
+                itemBuilder: (BuildContext context, int index) {
+                  return ChatUserCard(chatUserModel: listTemp[index]);
+                },
+              );
+
+            }else{
+              return const Center(child: Text('No hay conexion ..' , style: TextStyle(fontSize: 17),));
             }
-            
 
-            return ListView.builder(
-              physics:const  BouncingScrollPhysics(),
-              itemCount: listTemp.length,
-              itemBuilder: (BuildContext context, int index) {
-                return Text("Nombre: ${listTemp[index]}");
-              },
-            );
           }
-
         },
       ),
     );
