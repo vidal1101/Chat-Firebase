@@ -46,7 +46,7 @@ class _HomePageState extends State<HomePage> {
         ],
       ),
       body: StreamBuilder(
-        stream: authProvider.firebaseFirestore.collection(FirestoneConstants.pathUsercolection).snapshots(),
+        stream: authProvider.getAllUsers(),
         //initialData: const [],
         builder: (BuildContext context, AsyncSnapshot snapshot) {
 

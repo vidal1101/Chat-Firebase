@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:flutter/material.dart';
 
@@ -27,9 +28,13 @@ class _ChatUserCardState extends State<ChatUserCard> {
           
         },
         child:   ListTile(
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage(widget.chatUserModel.photoUrl),
-            //child: const Icon(Icons.person),
+          leading: CachedNetworkImage(
+            imageUrl: widget.chatUserModel.photoUrl,
+            imageBuilder: (context, imageProvider) => CircleAvatar(
+              backgroundImage: imageProvider,
+            ),
+            placeholder: (context, url) => const Center(child: Icon(Icons.person)), // Puedes personalizar el placeholder
+            errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
           ),
           title: Text(widget.chatUserModel.nickname),
           subtitle: Text('last message'),

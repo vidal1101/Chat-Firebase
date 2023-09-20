@@ -26,7 +26,19 @@ class AuthProviders extends ChangeNotifier {
   late final FirebaseStorage firebaseStorage;
   late final SharedPreferences sharedPreferences;
 
-  final FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+   AuthProviders({
+    required this.googleSignIn, 
+    required this.firebaseAuth, 
+    required this.firebaseStorage, 
+    required this.sharedPreferences,
+  });
+
+
+  static FirebaseFirestore firebaseFirestore = FirebaseFirestore.instance;
+
+  User? get firebaseUserCurrent  => firebaseAuth.currentUser;
+
   List<ChatUserModel> _listChat = [];
 
 
@@ -43,13 +55,7 @@ class AuthProviders extends ChangeNotifier {
   Status get status => _status;
 
 
-  AuthProviders({
-    required this.googleSignIn, 
-    required this.firebaseAuth, 
-    required this.firebaseStorage, 
-    required this.sharedPreferences,
-  });
-
+ 
   String? getUserFirebaseId(){
     return sharedPreferences.getString(FirestoneConstants.id);
   }
@@ -77,13 +83,9 @@ class AuthProviders extends ChangeNotifier {
       
 
       User? firebaseUser = (await firebaseAuth.signInWithCredential(authCredential)).user;
-      final firebaseAuthUser = await firebaseAuth.signInWithCredential(
-        authCredential
-      );
+      //firebaseUserCurrent = (await firebaseAuth.signInWithCredential(authCredential)).user;
 
-      if(firebaseAuthUser.user!.uid.isNotEmpty){
-        print(firebaseAuthUser);
-      }
+      print(firebaseUserCurrent.toString());
 
 
       if(firebaseUser != null){
@@ -97,15 +99,17 @@ class AuthProviders extends ChangeNotifier {
 
 
         if(documentSnapshot.length == 0 ){
-          
-          //obtenemos instancia del usuario actual
+
+
+          final time = DateTime.now().millisecondsSinceEpoch.toString();
+          //crear el usuario a nivel de firabase.
           FirebaseFirestore.instance.collection(FirestoneConstants.pathUsercolection).doc(firebaseUser.uid).set({
             FirestoneConstants.nickName : firebaseUser.displayName, 
             FirestoneConstants.photoUrl : firebaseUser.photoURL, 
             FirestoneConstants.id : firebaseUser.uid, 
-            'createdAt' : DateTime.now().millisecondsSinceEpoch.toString(), 
+            'createdAt' : time, 
             //datos extras por agregar. 
-            FirestoneConstants.lastActive : '',
+            FirestoneConstants.lastActive : time,
             FirestoneConstants.isOnline : false , 
             FirestoneConstants.pushToken : '',
             FirestoneConstants.chattingWith : null,
@@ -168,6 +172,16 @@ class AuthProviders extends ChangeNotifier {
     await firebaseAuth.signOut();
     await googleSignIn.disconnect();
     await googleSignIn.signOut();
+  }
+
+
+  //obtener la lista de usuarios, menos el usuario actual con session,
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers(){
+    final uid = sharedPreferences.getString(FirestoneConstants.id);
+    return firebaseFirestore
+      .collection(FirestoneConstants.pathUsercolection)
+      .where(FirestoneConstants.id , isNotEqualTo: firebaseUserCurrent!.uid )
+      .snapshots();
   }
 
 
