@@ -1,6 +1,7 @@
 
 import 'dart:convert';
 
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/helper/constanst.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
@@ -25,7 +26,13 @@ class _HomePageState extends State<HomePage> {
     // TODO: implement initState
     super.initState();
     Future.delayed(Duration.zero,() {
+      getInfoCurrentUser();
     },);
+  }
+
+  getInfoCurrentUser()async{
+    final authProvider = Provider.of<AuthProviders>(context, listen: false);
+    authProvider.getSelfInfo();
   }
 
 
@@ -36,7 +43,8 @@ class _HomePageState extends State<HomePage> {
     final authProvider = Provider.of<AuthProviders>(context);
     return  Scaffold(
       appBar: AppBar(
-        title: Text(''.toString()),
+        leading: photoProfile(),
+        title:  nameUser(), 
         actions: [
           IconButton(onPressed: () async{
             final authProvider = Provider.of<AuthProviders>(context, listen: false);
@@ -79,4 +87,39 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+
+  
+  Widget nameUser(){
+    final authProvider = Provider.of<AuthProviders>(context, listen: false);
+    switch (authProvider.enumLoadUser) {
+      case EnumLoadUser.load:
+        return Text(authProvider.userCurrentInfo.nickname);
+      default:
+        return const SizedBox();
+    }
+  }
+
+  Widget photoProfile(){
+    final authProvider = Provider.of<AuthProviders>(context, listen: false);
+    switch (authProvider.enumLoadUser) {
+      case EnumLoadUser.load:
+        return CachedNetworkImage(
+            imageUrl: authProvider.userCurrentInfo.photoUrl,
+            imageBuilder: (context, imageProvider) => Padding(
+              padding: const EdgeInsets.all(6.0),
+              child: CircleAvatar(
+                radius: 20,
+                backgroundImage: imageProvider,
+              ),
+            ),
+            placeholder: (context, url) => const Center(child: Icon(Icons.person)), // Puedes personalizar el placeholder
+            errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
+          );
+      default:
+        return const SizedBox();
+    }
+  }
+
+
 }

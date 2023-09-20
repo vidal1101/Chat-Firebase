@@ -19,6 +19,14 @@ enum Status {
   authenticateCanceled,
 }
 
+
+enum EnumLoadUser {
+  init, 
+  loading, 
+  load, 
+  error,
+}
+
 class AuthProviders extends ChangeNotifier {
 
   late final GoogleSignIn googleSignIn;
@@ -39,10 +47,16 @@ class AuthProviders extends ChangeNotifier {
 
   User? get firebaseUserCurrent  => firebaseAuth.currentUser;
 
+  //lista de chat en homepage
   List<ChatUserModel> _listChat = [];
+
+  //usuario actual y su informacion
+  ChatUserModel? _userCurrentInfo ;
 
 
   List<ChatUserModel> get listChat => _listChat;
+
+  ChatUserModel get userCurrentInfo => _userCurrentInfo!;
 
   set listChat(List<ChatUserModel> chatUserModel){
     _listChat = chatUserModel;
@@ -51,8 +65,10 @@ class AuthProviders extends ChangeNotifier {
   
   
   Status _status = Status.uninitialized;
+  EnumLoadUser _enumLoadUser = EnumLoadUser.init;
 
   Status get status => _status;
+  EnumLoadUser get enumLoadUser => _enumLoadUser;
 
 
  
@@ -60,11 +76,49 @@ class AuthProviders extends ChangeNotifier {
     return sharedPreferences.getString(FirestoneConstants.id);
   }
 
+
+  //revisar el login y autenticacion a firebase
   Future<bool> isLoggedIn()async{
     bool isloggin  = await googleSignIn.isSignedIn();
     if(isloggin && sharedPreferences.getString(FirestoneConstants.id)!.isNotEmpty == true) return true;
     return false;
   }
+
+
+  ///cerrar la session actual del usuario
+  Future<void> handlesingOut()async{
+    _status = Status.uninitialized;
+    await firebaseAuth.signOut();
+    await googleSignIn.disconnect();
+    await googleSignIn.signOut();
+  }
+
+
+  //obtener la lista de usuarios, menos el usuario actual con session,
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers(){
+    final uid = sharedPreferences.getString(FirestoneConstants.id);
+    return firebaseFirestore
+      .collection(FirestoneConstants.pathUsercolection)
+      .where(FirestoneConstants.id , isNotEqualTo: firebaseUserCurrent!.uid )
+      .snapshots();
+  }
+
+
+  //getting the inform user current; 
+  Future<void> getSelfInfo()async{
+    _enumLoadUser = EnumLoadUser.loading;
+    await firebaseFirestore.collection(FirestoneConstants.pathUsercolection)
+    .doc(firebaseUserCurrent!.uid).get().then((user)async{
+      if(user.exists){
+        _userCurrentInfo = ChatUserModel.fromJson(user.data()!);
+        _enumLoadUser = EnumLoadUser.load;
+        notifyListeners();
+      }else{
+        await handleSignIn().then((value) => getSelfInfo());
+      }
+    });
+  }
+
 
   Future<bool> handleSignIn ()async{
 
@@ -164,24 +218,6 @@ class AuthProviders extends ChangeNotifier {
       return false;
     }
 
-  }
-
-  ///cerrar la session actual del usuario
-  Future<void> handlesingOut()async{
-    _status = Status.uninitialized;
-    await firebaseAuth.signOut();
-    await googleSignIn.disconnect();
-    await googleSignIn.signOut();
-  }
-
-
-  //obtener la lista de usuarios, menos el usuario actual con session,
-  Stream<QuerySnapshot<Map<String, dynamic>>> getAllUsers(){
-    final uid = sharedPreferences.getString(FirestoneConstants.id);
-    return firebaseFirestore
-      .collection(FirestoneConstants.pathUsercolection)
-      .where(FirestoneConstants.id , isNotEqualTo: firebaseUserCurrent!.uid )
-      .snapshots();
   }
 
 

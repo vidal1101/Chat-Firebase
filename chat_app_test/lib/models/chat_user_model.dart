@@ -10,6 +10,7 @@ class ChatUserModel {
     final String id;
     final String pushToken;
     final dynamic chattingWith;
+    
 
     ChatUserModel({
         required this.photoUrl,
