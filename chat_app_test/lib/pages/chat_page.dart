@@ -1,6 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
+import 'package:chat_app_test/providers/auth_provider.dart';
+import 'package:chat_app_test/widgets/loading.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class ChatPage extends StatefulWidget {
 
@@ -14,8 +17,11 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProviders>(context);
+
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
@@ -25,6 +31,40 @@ class _ChatPageState extends State<ChatPage> {
       body: Column(
         children: [
 
+          Expanded(
+            child: StreamBuilder(
+              stream: authProvider.getAllUsers(),
+              //initialData: const [],
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+          
+                if(!snapshot.hasData){
+                  return const Center(child:LoadingMessages(),);
+                }else if(snapshot.connectionState == ConnectionState.waiting){
+                  return const Center(child:LoadingMessages(),);
+                }else{
+          
+                  final list = [];
+                  //authProvider.listChat  = listTemp;
+          
+                  if(list.isNotEmpty){
+                    return ListView.builder(
+                      physics:const  BouncingScrollPhysics(),
+                      itemCount: list.length,
+                      itemBuilder: (BuildContext context, int index) {
+                        return SizedBox();
+                      },
+                    );
+          
+                  }else{
+                    return const Center(child: Text('No hay mensajes.' , style: TextStyle(fontSize: 17),));
+                  }
+          
+                }
+              },
+            ),
+          ),
+
+          ///enviar mensaje y controles de chat  
           chatInput(), 
         ],
       ),
