@@ -1,5 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
+import 'package:chat_app_test/pages/chat_page.dart';
 import 'package:flutter/material.dart';
 
 
@@ -24,7 +25,31 @@ class _ChatUserCardState extends State<ChatUserCard> {
       elevation: 1,
       child: InkWell(
         onTap: ()async {
-          ///navegaf al chat.
+          ///navegaf al chat de cada usuario.
+           // Definir la duración de la animación
+            const Duration duration = Duration(milliseconds: 500);
+
+            // Definir la función de animación personalizada
+            PageRouteBuilder pageRouteBuilder = PageRouteBuilder(
+              pageBuilder: (context, animation, secondaryAnimation) =>
+                  ChatPage(chatUserModel: widget.chatUserModel),
+              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                const begin = Offset(1.0, 0.0);
+                const end = Offset.zero;
+                const curve = Curves.easeInOut;
+                var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                var offsetAnimation = animation.drive(tween);
+
+                return SlideTransition(
+                  position: offsetAnimation,
+                  child: child,
+                );
+              },
+              transitionDuration: duration,
+            );
+
+            // Navegar utilizando la animación personalizada
+            await Navigator.of(context).push(pageRouteBuilder);
           
         },
         child:   ListTile(
