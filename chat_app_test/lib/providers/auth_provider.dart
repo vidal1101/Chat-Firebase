@@ -1,6 +1,7 @@
 
 import 'package:chat_app_test/helper/constanst.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
+import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/models/user_chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -220,6 +221,50 @@ class AuthProviders extends ChangeNotifier {
 
   }
 
+  /**
+   * 
+   * seccion de chat.
+   * 
+  */
+
+  //obtener la conversacion segun el id pasado por parametros. 
+  String getConversationID(String id){
+    return firebaseUserCurrent!.uid.hashCode <= id.hashCode ?
+    '${firebaseUserCurrent!.uid}_$id' : '${id}_${firebaseUserCurrent!.uid}';
+  }
+
+  //
+  Stream<QuerySnapshot<Map<String, dynamic>>> getAllMessages({
+    required ChatUserModel chatUserModel,
+  }){
+    return firebaseFirestore
+      .collection(
+        "chats/${getConversationID(firebaseUserCurrent!.uid)}/messages/"
+      )
+      .snapshots();
+  }
+
+ 
+  //enviar el mensaje.
+  Future<void> sendMessage(ChatUserModel chatUserModel, String msgs)async{
+    final time = DateTime.now().millisecondsSinceEpoch.toString();
+
+    //enviando el mensaje
+    final MessageModel messageModel = MessageModel(
+      msg: msgs,
+      read: '',
+      told: chatUserModel.id, 
+      type: 'text',
+      fromId: firebaseUserCurrent!.uid,
+      sent: time,
+    );
+
+    final ref = firebaseFirestore.collection("chats/${getConversationID(chatUserModel.id)}/messages/");
+    await ref.doc(time).set(messageModel.toJson());
+
+  }
+
+  
 
 
 }

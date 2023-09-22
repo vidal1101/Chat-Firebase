@@ -79,7 +79,7 @@ class _HomePageState extends State<HomePage> {
               );
 
             }else{
-              return const Center(child: Text('No hay conexion ..' , style: TextStyle(fontSize: 17),));
+              return const Center(child: Text('No hay chats en este momento..' , style: TextStyle(fontSize: 17),));
             }
 
           }

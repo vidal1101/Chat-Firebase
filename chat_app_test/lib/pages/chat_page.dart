@@ -1,10 +1,17 @@
+import 'dart:convert';
+
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
+import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
 import 'package:chat_app_test/widgets/loading.dart';
+import 'package:chat_app_test/widgets/message_card.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+
+///pagina principal de chat
 class ChatPage extends StatefulWidget {
 
   final ChatUserModel chatUserModel;
@@ -17,6 +24,9 @@ class ChatPage extends StatefulWidget {
 }
 
 class _ChatPageState extends State<ChatPage> {
+
+  List<MessageModel> listMessages = [];
+
 
   @override
   Widget build(BuildContext context) {
@@ -33,7 +43,7 @@ class _ChatPageState extends State<ChatPage> {
 
           Expanded(
             child: StreamBuilder(
-              stream: authProvider.getAllUsers(),
+              stream: authProvider.getAllMessages(chatUserModel: widget.chatUserModel),
               //initialData: const [],
               builder: (BuildContext context, AsyncSnapshot snapshot) {
           
@@ -43,15 +53,26 @@ class _ChatPageState extends State<ChatPage> {
                   return const Center(child:LoadingMessages(),);
                 }else{
           
-                  final list = [];
-                  //authProvider.listChat  = listTemp;
+                  //final list = [];
+                  listMessages.clear();
+                  final List<DocumentSnapshot> data = snapshot.data.docs;
+
+                  print("${jsonEncode( data[0].data() )}");
+
+                  listMessages = data.map((e) => MessageModel.fromJson( e.data() as Map<String, dynamic>)  ).toList() ?? [];
+
+                  // listMessages.add(MessageModel(msg: 'hola sdsf', read: '', told: 'xyz',
+                  // type: '', fromId: authProvider.userCurrentInfo.id , sent: '12:00 am'));
+
+                  // listMessages.add(MessageModel(msg: 'hii', read: '', told: authProvider.userCurrentInfo.id,
+                  // type: '', fromId: 'xyz' , sent: '12:00 am'));
           
-                  if(list.isNotEmpty){
+                  if(listMessages.isNotEmpty){
                     return ListView.builder(
                       physics:const  BouncingScrollPhysics(),
-                      itemCount: list.length,
+                      itemCount: listMessages.length,
                       itemBuilder: (BuildContext context, int index) {
-                        return SizedBox();
+                        return  MessageCard(  messageModel:  listMessages[index],); 
                       },
                     );
           
