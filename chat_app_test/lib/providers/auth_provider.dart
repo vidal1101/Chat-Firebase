@@ -246,7 +246,10 @@ class AuthProviders extends ChangeNotifier {
 
  
   //enviar el mensaje.
-  Future<void> sendMessage(ChatUserModel chatUserModel, String msgs)async{
+  Future<void> sendMessage({
+    required ChatUserModel chatUserModel, 
+    required String msgs,
+  })async{
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
     //enviando el mensaje

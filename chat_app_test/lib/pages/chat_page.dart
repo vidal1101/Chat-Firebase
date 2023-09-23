@@ -27,6 +27,8 @@ class _ChatPageState extends State<ChatPage> {
 
   List<MessageModel> listMessages = [];
 
+  TextEditingController textEditingController = TextEditingController();
+
 
   @override
   Widget build(BuildContext context) {
@@ -144,18 +146,19 @@ class _ChatPageState extends State<ChatPage> {
         Expanded(child: 
         Card(
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-          child: const  Row(
+          child:  Row(
             children: [
               //emoji button
-              IconButton(onPressed: null,
+              const IconButton(onPressed: null,
                icon: Icon(Icons.emoji_emotions_rounded, color: Colors.blueAccent,)), 
 
                //espacio para escribir 
                Expanded(
                  child: TextField(
+                  controller:  textEditingController,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
-                  decoration: InputDecoration(
+                  decoration: const InputDecoration(
                     hintText: 'Escribir algo..',
                     hintStyle: TextStyle(color: Colors.blueAccent, ),
                     border: InputBorder.none,
@@ -164,11 +167,11 @@ class _ChatPageState extends State<ChatPage> {
                ),
 
                //acceso a gallery
-               IconButton(onPressed: null,
+               const IconButton(onPressed: null,
                icon: Icon(Icons.image, color: Colors.blueAccent,)),
 
                //acceso a camara.
-               IconButton(onPressed: null,
+               const IconButton(onPressed: null,
                icon: Icon(Icons.camera_alt, color: Colors.blueAccent,)),  
             ],
           ),
@@ -176,8 +179,20 @@ class _ChatPageState extends State<ChatPage> {
 
         //enviar el mensaje
         InkWell(
-          onTap: () {
+          onTap: () async{
             //enviar el mensaje
+            if(textEditingController.text.isEmpty) return;
+
+            final authProviders = Provider.of<AuthProviders>(context, listen: false);
+
+            await authProviders.sendMessage(
+              chatUserModel: widget.chatUserModel,
+              msgs: textEditingController.text,
+            );
+
+            textEditingController.text = '';
+            
+
           },
           child: const Padding(
             padding:  EdgeInsets.only(top: 10 , bottom: 10 , left: 5, right: 10), 
