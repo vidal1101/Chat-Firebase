@@ -239,7 +239,7 @@ class AuthProviders extends ChangeNotifier {
   }){
     return firebaseFirestore
       .collection(
-        "chats/${getConversationID(firebaseUserCurrent!.uid)}/messages/"
+        "chats/${getConversationID(chatUserModel.id)}/messages/"
       )
       .snapshots();
   }

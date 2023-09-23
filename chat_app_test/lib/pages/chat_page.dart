@@ -56,10 +56,10 @@ class _ChatPageState extends State<ChatPage> {
                 }else{
           
                   //final list = [];
-                  listMessages.clear();
+                  //listMessages.clear();
                   final List<DocumentSnapshot> data = snapshot.data.docs;
 
-                  print("${jsonEncode( data[0].data() )}");
+                  //print("${jsonEncode( data[0].data() )}");
 
                   listMessages = data.map((e) => MessageModel.fromJson( e.data() as Map<String, dynamic>)  ).toList() ?? [];
 
@@ -191,7 +191,7 @@ class _ChatPageState extends State<ChatPage> {
             );
 
             textEditingController.text = '';
-            
+
 
           },
           child: const Padding(
