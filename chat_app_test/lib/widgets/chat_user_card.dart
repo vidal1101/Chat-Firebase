@@ -1,7 +1,12 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:chat_app_test/helper/helper.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
+import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/pages/chat_page.dart';
+import 'package:chat_app_test/providers/auth_provider.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 
 class ChatUserCard extends StatefulWidget {
@@ -15,9 +20,14 @@ class ChatUserCard extends StatefulWidget {
 }
 
 class _ChatUserCardState extends State<ChatUserCard> {
+
+  // last message info if( null -> not message )
+  MessageModel? lastmessageModel;
+
   @override
   Widget build(BuildContext context) {
     final currentSize = MediaQuery.of(context).size;
+    final authProviders = Provider.of<AuthProviders>(context);
     return Card(
       margin:  EdgeInsets.symmetric(horizontal: currentSize.width * .04 , vertical: 4 ),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
@@ -52,19 +62,51 @@ class _ChatUserCardState extends State<ChatUserCard> {
             await Navigator.of(context).push(pageRouteBuilder);
           
         },
-        child:   ListTile(
-          leading: CachedNetworkImage(
-            imageUrl: widget.chatUserModel.photoUrl,
-            imageBuilder: (context, imageProvider) => CircleAvatar(
-              backgroundImage: imageProvider,
-            ),
-            placeholder: (context, url) => const Center(child: Icon(Icons.person)), // Puedes personalizar el placeholder
-            errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
-          ),
-          title: Text(widget.chatUserModel.nickname),
-          subtitle: Text('last message'),
-          trailing: Text('12:00pm', 
-          style: TextStyle(color: Colors.black54),),
+        child:  StreamBuilder(
+          stream: authProviders.getLastMessage(widget.chatUserModel),
+          builder: (BuildContext context, AsyncSnapshot snapshot) {
+
+            if(!snapshot.hasData){
+              return const Center(child:SizedBox(),);
+            }else if(snapshot.connectionState == ConnectionState.waiting){
+              return const Center(child:SizedBox(),);
+            }else{
+
+              final List<DocumentSnapshot> data = snapshot.data.docs;
+
+              final lastMessage = data.map((e) => MessageModel.fromJson( e.data() as Map<String, dynamic>)  ).toList() ?? [];
+
+
+              if(lastMessage.isNotEmpty){
+                lastmessageModel = lastMessage[0];
+              }
+
+              
+              return  ListTile(
+                leading: CachedNetworkImage(
+                  imageUrl: widget.chatUserModel.photoUrl,
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    backgroundImage: imageProvider,
+                  ),
+                  placeholder: (context, url) => const Center(child: Icon(Icons.person)), // Puedes personalizar el placeholder
+                  errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
+                ),
+                title: Text(widget.chatUserModel.nickname),
+                subtitle: Text(
+                  lastmessageModel!.msg != null ? lastmessageModel!.msg : '',
+                ),
+                trailing: lastMessage == null ? 
+                  null : //no mostramos ningun mensaje
+                  lastmessageModel!.read.isEmpty &&
+                  lastmessageModel!.fromId != authProviders.firebaseUserCurrent!.uid ? 
+                const CircleAvatar(radius: 5, backgroundColor: Colors.green,) : //mostrado como leido
+                Text(FunctionHelpersChat.getFormatTime(context: context, time: lastmessageModel!.sent )), //emvio
+              );
+
+
+            }
+
+          },
         ),
       ),
     );

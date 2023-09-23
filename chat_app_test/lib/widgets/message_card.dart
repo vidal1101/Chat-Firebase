@@ -1,3 +1,4 @@
+import 'package:chat_app_test/helper/helper.dart';
 import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
@@ -29,6 +30,12 @@ class _MessageCardState extends State<MessageCard> {
 
   // mensahes remitente
   Widget _blueMessages(Size media){
+
+    if(widget.messageModel.read.isEmpty){
+      final authProvider = Provider.of<AuthProviders>(context, listen: false);
+      authProvider.updateMessageReadStatus(widget.messageModel);
+    }
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -40,7 +47,7 @@ class _MessageCardState extends State<MessageCard> {
             padding: EdgeInsets.all(media.width * .04 ),
             decoration: BoxDecoration(color: Color.fromARGB(255, 221, 245, 255),
               border: Border.all(color: Colors.lightBlue),
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(30),
                 topRight: Radius.circular(30), 
                 bottomRight: Radius.circular(30),
@@ -55,7 +62,7 @@ class _MessageCardState extends State<MessageCard> {
 
         Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Text(widget.messageModel.sent, style: TextStyle(fontSize: 12 , color: Colors.black54),),
+          child: Text(FunctionHelpersChat.getFormatTime(context: context, time: widget.messageModel.sent ), style: TextStyle(fontSize: 12 , color: Colors.black54),),
         )
       ],
     );
@@ -71,11 +78,15 @@ class _MessageCardState extends State<MessageCard> {
         Row(
           children: [
             SizedBox(width: media.width * .04,),
-            Icon(Icons.done_all_rounded, color: Colors.blueGrey, size: 20,), 
-            SizedBox(width: 2,), 
-            
+            //el leido del mensaje
+            if(widget.messageModel.read.isNotEmpty)
+              const Icon(Icons.done_all_rounded, color: Colors.blueGrey, size: 20,), 
 
-            Text(widget.messageModel.read + '11:44  am', style: TextStyle(fontSize: 12 , color: Colors.black54),),
+            const SizedBox(width: 2,), 
+            
+            //hora de envio
+            Text(FunctionHelpersChat.getFormatTime(context: context, time: widget.messageModel.sent ),
+             style: const TextStyle(fontSize: 12 , color: Colors.black54),),
           ],
         ), 
 
@@ -88,16 +99,16 @@ class _MessageCardState extends State<MessageCard> {
               horizontal: media.width * .04 , vertical: media.height * .01
             ),
             padding: EdgeInsets.all(media.width * .04 ),
-            decoration: BoxDecoration(color: Color.fromARGB(255, 218, 255, 176),
+            decoration: BoxDecoration(color: const Color.fromARGB(255, 218, 255, 176),
               border: Border.all(color: Colors.lightGreen),
-              borderRadius: BorderRadius.only(
+              borderRadius: const BorderRadius.only(
                 topLeft: Radius.circular(30),
                 topRight: Radius.circular(30), 
                 bottomLeft: Radius.circular(30),
               )
             ),
             child: Text(widget.messageModel.msg,
-              style: TextStyle(color: Colors.black , fontSize: 15),
+              style: const TextStyle(color: Colors.black , fontSize: 15),
             ),
           ),
         ),

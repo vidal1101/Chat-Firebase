@@ -267,6 +267,21 @@ class AuthProviders extends ChangeNotifier {
 
   }
 
+
+  Future<void> updateMessageReadStatus(MessageModel messageModel)async{
+    firebaseFirestore.collection("chats/${getConversationID(messageModel.fromId)}/messages/",)
+      .doc(messageModel.sent)
+      .update({'read': DateTime.now().millisecondsSinceEpoch.toString() });
+  }
+
+  //obtener el ultimo mensaje
+  Stream<QuerySnapshot> getLastMessage(ChatUserModel chatUserModel){
+    return firebaseFirestore
+      .collection("chats/${getConversationID(chatUserModel.id)}/messages/")
+      .orderBy('sent', descending: true)
+      .limit(1)
+      .snapshots();
+  }
   
 
 
