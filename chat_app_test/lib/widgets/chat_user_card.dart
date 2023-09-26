@@ -99,12 +99,12 @@ class _ChatUserCardState extends State<ChatUserCard> {
                 subtitle: Text(
                    lastMessage == null ? "" : lastmessageModel!.msg ?? "",
                 ),
-                trailing: lastMessage == null ? 
-                  const SizedBox() : //no mostramos ningun mensaje
+                trailing: lastMessage.length == 0 ? const Text('Nuevo usuario') : // no mostrar nada, si es nuevo usuario
+                          lastMessage == null ?  const SizedBox() : //no mostramos ningun mensaje
                   lastmessageModel!.read.isEmpty &&
                   lastmessageModel!.fromId != authProviders.firebaseUserCurrent!.uid ? 
-                const CircleAvatar(radius: 5, backgroundColor: Colors.green,) : //mostrado como leido
-                Text(FunctionHelpersChat.getFormatTime(context: context, time: lastmessageModel!.sent )), //emvio
+                const CircleAvatar(radius: 5, backgroundColor: Colors.green,) : //mostrado como no leido
+                Text(FunctionHelpersChat.getFormatTime(context: context, time: lastmessageModel!.sent )), //sino la ultima vez
               );
 
 

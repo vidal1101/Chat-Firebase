@@ -1,4 +1,5 @@
-import 'dart:convert';
+
+import 'dart:io';
 
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
@@ -9,6 +10,8 @@ import 'package:chat_app_test/widgets/message_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+
+import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 
 
 ///pagina principal de chat
@@ -28,70 +31,83 @@ class _ChatPageState extends State<ChatPage> {
   List<MessageModel> listMessages = [];
 
   TextEditingController textEditingController = TextEditingController();
+  bool isShowEmoji = false;
 
 
   @override
   Widget build(BuildContext context) {
     final authProvider = Provider.of<AuthProviders>(context);
+    final currentSize = MediaQuery.of(context).size;
 
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        flexibleSpace: appbar(),
-      ),
-
-      body: Column(
-        children: [
-
-          Expanded(
-            child: StreamBuilder(
-              stream: authProvider.getAllMessages(chatUserModel: widget.chatUserModel),
-              //initialData: const [],
-              builder: (BuildContext context, AsyncSnapshot snapshot) {
-          
-                if(!snapshot.hasData){
-                  return const Center(child:LoadingMessages(),);
-                }else if(snapshot.connectionState == ConnectionState.waiting){
-                  return const Center(child:LoadingMessages(),);
-                }else{
-          
-                  //final list = [];
-                  //listMessages.clear();
-                  final List<DocumentSnapshot> data = snapshot.data.docs;
-
-                  //print("${jsonEncode( data[0].data() )}");
-
-                  listMessages = data.map((e) => MessageModel.fromJson( e.data() as Map<String, dynamic>)  ).toList() ?? [];
-
-                  // listMessages.add(MessageModel(msg: 'hola sdsf', read: '', told: 'xyz',
-                  // type: '', fromId: authProvider.userCurrentInfo.id , sent: '12:00 am'));
-
-                  // listMessages.add(MessageModel(msg: 'hii', read: '', told: authProvider.userCurrentInfo.id,
-                  // type: '', fromId: 'xyz' , sent: '12:00 am'));
-          
-                  if(listMessages.isNotEmpty){
-                    return ListView.builder(
-                      physics:const  BouncingScrollPhysics(),
-                      itemCount: listMessages.length,
-                      itemBuilder: (BuildContext context, int index) {
-                        return  MessageCard(  messageModel:  listMessages[index],); 
-                      },
-                    );
-          
-                  }else{
-                    return const Center(child: Text('No hay mensajes.' , style: TextStyle(fontSize: 17),));
-                  }
-          
-                }
-              },
-            ),
+    return GestureDetector(
+      onTap: () {
+        //FocusScope.of(context).unfocus();
+      },
+      child: SafeArea(
+        child: Scaffold(
+          appBar: AppBar(
+            automaticallyImplyLeading: false,
+            flexibleSpace: appbar(),
           ),
-
-          ///enviar mensaje y controles de chat  
-          chatInput(), 
-        ],
+            
+          body: Column(
+            children: [
+            
+              Expanded(
+                child: StreamBuilder(
+                  stream: authProvider.getAllMessages(chatUserModel: widget.chatUserModel),
+                  //initialData: const [],
+                  builder: (BuildContext context, AsyncSnapshot snapshot) {
+              
+                    if(!snapshot.hasData){
+                      return const Center(child:LoadingMessages(),);
+                    }else if(snapshot.connectionState == ConnectionState.waiting){
+                      return const Center(child:LoadingMessages(),);
+                    }else{
+              
+                      final List<DocumentSnapshot> data = snapshot.data.docs;
+            
+                      listMessages = data.map((e) => MessageModel.fromJson( e.data() as Map<String, dynamic>)  ).toList() ?? [];
+            
+              
+                      if(listMessages.isNotEmpty){
+                        return ListView.builder(
+                          physics:const  BouncingScrollPhysics(),
+                          itemCount: listMessages.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            return  MessageCard(  messageModel:  listMessages[index],); 
+                          },
+                        );
+              
+                      }else{
+                        return const Center(child: Text('No hay mensajes.' , style: TextStyle(fontSize: 17),));
+                      }
+              
+                    }
+                  },
+                ),
+              ),
+            
+              ///enviar mensaje y controles de chat  
+              chatInput(), 
+            
+              //showemoji.
+              if(isShowEmoji) 
+              SizedBox(
+                height: currentSize.height  * .20,
+                child: EmojiPicker(
+                    textEditingController: textEditingController, // pass here the same [TextEditingController] that is connected to your input field, usually a [TextFormField]
+                    config: Config(
+                        columns: 8,
+                        emojiSizeMax: 20 * (Platform.isIOS ? 1.30 : 1.0), 
+                    ),
+                ),
+              ),
+            
+            ],
+          ),
+        ),
       ),
-
     );
   }
 
@@ -126,8 +142,8 @@ class _ChatPageState extends State<ChatPage> {
                 fontWeight: FontWeight.w500,
               ),), 
     
-              Text('Last seen recently' , style: 
-              const TextStyle(
+              const Text('Ultima vez recientemente' , style: 
+               TextStyle(
                 fontSize: 12, 
                 color: Colors.black54, 
               ),)
@@ -149,12 +165,18 @@ class _ChatPageState extends State<ChatPage> {
           child:  Row(
             children: [
               //emoji button
-              const IconButton(onPressed: null,
-               icon: Icon(Icons.emoji_emotions_rounded, color: Colors.blueAccent,)), 
+              IconButton(onPressed: () {
+                setState(() => isShowEmoji = !isShowEmoji );
+              },
+               icon: const Icon(Icons.emoji_emotions_rounded, color: Colors.blueAccent,)), 
 
                //espacio para escribir 
                Expanded(
                  child: TextField(
+                  onTap: () {
+                    //FocusScope.of(context).unfocus();
+                    //if(isShowEmoji) setState(() => isShowEmoji = !isShowEmoji );
+                  },
                   controller:  textEditingController,
                   keyboardType: TextInputType.multiline,
                   maxLines: null,
@@ -206,6 +228,8 @@ class _ChatPageState extends State<ChatPage> {
       ],
     );
   }
+
+
 
 
 }
