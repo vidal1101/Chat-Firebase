@@ -79,10 +79,14 @@ class _ChatUserCardState extends State<ChatUserCard> {
 
               if(lastMessage.isNotEmpty){
                 lastmessageModel = lastMessage[0];
+              }else if(lastMessage.length == 0){
+                lastmessageModel = MessageModel(msg: '', read: '', told: '', 
+                type: '', fromId: '', sent: '');
               }
 
               
               return  ListTile(
+                
                 leading: CachedNetworkImage(
                   imageUrl: widget.chatUserModel.photoUrl,
                   imageBuilder: (context, imageProvider) => CircleAvatar(
@@ -93,10 +97,10 @@ class _ChatUserCardState extends State<ChatUserCard> {
                 ),
                 title: Text(widget.chatUserModel.nickname),
                 subtitle: Text(
-                  lastmessageModel!.msg != null ? lastmessageModel!.msg : '',
+                   lastMessage == null ? "" : lastmessageModel!.msg ?? "",
                 ),
                 trailing: lastMessage == null ? 
-                  null : //no mostramos ningun mensaje
+                  const SizedBox() : //no mostramos ningun mensaje
                   lastmessageModel!.read.isEmpty &&
                   lastmessageModel!.fromId != authProviders.firebaseUserCurrent!.uid ? 
                 const CircleAvatar(radius: 5, backgroundColor: Colors.green,) : //mostrado como leido
