@@ -193,6 +193,7 @@ class _ChatPageState extends State<ChatPage> {
               IconButton(onPressed: () {
                  //acceso a galeria o camara.
                  FocusScope.of(context).unfocus();
+                 AlertWidgets.currentContext = context;
                  AlertWidgets.showDialogImage(context: context, chatUserModel: widget.chatUserModel );
                },
                icon: const Icon(Icons.image, color: Colors.blueAccent,)),

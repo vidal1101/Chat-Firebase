@@ -95,9 +95,13 @@ class _ChatUserCardState extends State<ChatUserCard> {
                   placeholder: (context, url) => const Center(child: Icon(Icons.person)), // Puedes personalizar el placeholder
                   errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
                 ),
+                //nombre del usuario
                 title: Text(widget.chatUserModel.nickname),
+                //ultimo mensaje
                 subtitle: Text(
-                   lastMessage == null ? "" : lastmessageModel!.msg ?? "",
+                   lastMessage == null ? "" : 
+                   lastmessageModel!.type == 'image' ? 'Imagen.' :
+                   lastmessageModel!.msg ?? "",
                 ),
                 trailing: lastMessage.length == 0 ? const Text('Nuevo usuario') : // no mostrar nada, si es nuevo usuario
                           lastMessage == null ?  const SizedBox() : //no mostramos ningun mensaje

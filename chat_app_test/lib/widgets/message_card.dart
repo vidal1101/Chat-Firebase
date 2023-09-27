@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/helper/helper.dart';
 import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
@@ -53,9 +54,21 @@ class _MessageCardState extends State<MessageCard> {
                 bottomRight: Radius.circular(30),
               )
             ),
-            child: Text(widget.messageModel.msg,
-              style: TextStyle(color: Colors.black , fontSize: 15),
-            ),
+            child: widget.messageModel.type == 'image' 
+              ? ClipRRect(
+                borderRadius: BorderRadius.circular(10),
+                child: CachedNetworkImage(
+                  imageUrl: widget.messageModel.msg,
+                  imageBuilder: (context, imageProvider) => CircleAvatar(
+                    backgroundImage: imageProvider,
+                  ),
+                  placeholder: (context, url) => const Center(child: Icon(Icons.image)), // Puedes personalizar el placeholder
+                  errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
+                ),
+              ) 
+              : Text(widget.messageModel.msg,
+                style: const TextStyle(color: Colors.black , fontSize: 15),
+              ),
           ),
         ),
 
@@ -95,10 +108,10 @@ class _MessageCardState extends State<MessageCard> {
         //contenido del mensaje
         Flexible(
           child: Container(
-            margin: EdgeInsets.symmetric(
+            margin:   EdgeInsets.symmetric(
               horizontal: media.width * .04 , vertical: media.height * .01
             ),
-            padding: EdgeInsets.all(media.width * .04 ),
+            padding:  EdgeInsets.all(media.width * .04 ),
             decoration: BoxDecoration(color: const Color.fromARGB(255, 218, 255, 176),
               border: Border.all(color: Colors.lightGreen),
               borderRadius: const BorderRadius.only(
@@ -107,9 +120,19 @@ class _MessageCardState extends State<MessageCard> {
                 bottomLeft: Radius.circular(30),
               )
             ),
-            child: Text(widget.messageModel.msg,
-              style: const TextStyle(color: Colors.black , fontSize: 15),
-            ),
+            child:  widget.messageModel.type == 'image' 
+              ? ClipRRect(
+                borderRadius: BorderRadius.circular(15),
+                child: CachedNetworkImage(
+                  imageUrl: widget.messageModel.msg,
+                  fit: BoxFit.fill,
+                  placeholder: (context, url) => const Center(child: Icon(Icons.image)), // Puedes personalizar el placeholder
+                  errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
+                ),
+              ) 
+              : Text(widget.messageModel.msg,
+                style: const TextStyle(color: Colors.black , fontSize: 15),
+              ),
           ),
         ),
 
