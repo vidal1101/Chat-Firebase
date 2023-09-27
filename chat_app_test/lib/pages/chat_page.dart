@@ -5,6 +5,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
+import 'package:chat_app_test/widgets/alert_widgets.dart';
 import 'package:chat_app_test/widgets/loading.dart';
 import 'package:chat_app_test/widgets/message_card.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -189,17 +190,18 @@ class _ChatPageState extends State<ChatPage> {
                ),
 
                //acceso a gallery
-               const IconButton(onPressed: null,
-               icon: Icon(Icons.image, color: Colors.blueAccent,)),
-
-               //acceso a camara.
-               const IconButton(onPressed: null,
-               icon: Icon(Icons.camera_alt, color: Colors.blueAccent,)),  
+              IconButton(onPressed: () {
+                 //acceso a galeria o camara.
+                 FocusScope.of(context).unfocus();
+                 AlertWidgets.showDialogImage(context: context, chatUserModel: widget.chatUserModel );
+               },
+               icon: const Icon(Icons.image, color: Colors.blueAccent,)),
+              
             ],
           ),
         )), 
 
-        //enviar el mensaje
+        //enviar el mensaje de texto.
         InkWell(
           onTap: () async{
             //enviar el mensaje
@@ -210,6 +212,7 @@ class _ChatPageState extends State<ChatPage> {
             await authProviders.sendMessage(
               chatUserModel: widget.chatUserModel,
               msgs: textEditingController.text,
+              type: 'text'
             );
 
             textEditingController.text = '';

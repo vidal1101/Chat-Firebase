@@ -1,6 +1,7 @@
 
 import 'package:chat_app_test/pages/pages.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
+import 'package:chat_app_test/providers/permission_providers.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,13 +18,30 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     // TODO: implement initState
     super.initState();
-    Future.delayed( const Duration(seconds: 5),() {
-      checkSignIn(context);
+    Future.delayed( const Duration(seconds: 5),() async{
+      await getAllPermission();
+      await checkSignIn(context);
     },);
   }
 
 
-  void checkSignIn(BuildContext context)async{
+  Future<void> getAllPermission()async{
+    //permisos de camara.
+    final permissionsProvider = Provider.of<PermissionsProvider>(context,listen: false);
+    await permissionsProvider.initPermissions();
+    await permissionsProvider.requestPermissionCamera().then((value) {
+        print("permisos de camara: ${permissionsProvider.cameraPermissionStatus}");
+    });
+    //permisos de galeria. 
+    await permissionsProvider.initPermissions();
+    await permissionsProvider.requestPermissionPhotos().then((value) {
+      print("permisos de galeria: ${permissionsProvider.galleryPermissionStatus}");
+    });
+    
+  }
+
+
+  Future<void> checkSignIn(BuildContext context)async{
     final authProvider = Provider.of<AuthProviders>(context, listen:  false);
 
     bool isLogin = await authProvider.isLoggedIn();

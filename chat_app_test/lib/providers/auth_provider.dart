@@ -1,4 +1,7 @@
 
+import 'dart:io';
+import 'dart:math';
+
 import 'package:chat_app_test/helper/constanst.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:chat_app_test/models/message_model.dart';
@@ -249,6 +252,7 @@ class AuthProviders extends ChangeNotifier {
   Future<void> sendMessage({
     required ChatUserModel chatUserModel, 
     required String msgs,
+    required String type,
   })async{
     final time = DateTime.now().millisecondsSinceEpoch.toString();
 
@@ -257,7 +261,7 @@ class AuthProviders extends ChangeNotifier {
       msg: msgs,
       read: '',
       told: chatUserModel.id, 
-      type: 'text',
+      type: type,
       fromId: firebaseUserCurrent!.uid,
       sent: time,
     );
@@ -281,6 +285,33 @@ class AuthProviders extends ChangeNotifier {
       .orderBy('sent', descending: true)
       .limit(1)
       .snapshots();
+  }
+
+
+
+  Future<void> sendImageChat(ChatUserModel chatUserModel, File file)async{
+    final time = DateTime.now().millisecondsSinceEpoch.toString();
+
+    //extraer extension de la imagen.
+    final ext = file.path.split('.').last;
+
+    //referencia del archivo a firebase Storage.
+    final ref = firebaseStorage.ref().child(
+      "images/${getConversationID(chatUserModel.id)}/$time.$ext"
+    );
+
+    //subiendo el archivo
+    await ref.
+      putFile(file, SettableMetadata(contentType: "image/$ext") )
+      .then((p0){
+        debugPrint('data tranfiriendo: ${p0.bytesTransferred / 1000} kb');
+    });
+
+    //obtener ruta absoluta de la imagen.
+    final imageUrl = await ref.getDownloadURL();
+    //enviar el mensaje con la imagen
+    await sendMessage(chatUserModel: chatUserModel, msgs: imageUrl, type: 'image');
+
   }
   
 

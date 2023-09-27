@@ -1,5 +1,6 @@
 import 'package:chat_app_test/providers/auth_provider.dart';
 import 'package:chat_app_test/providers/initproviders.dart';
+import 'package:chat_app_test/providers/permission_providers.dart';
 import 'package:chat_app_test/routes/routes.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -30,7 +31,11 @@ class MyApp extends StatelessWidget {
           firebaseAuth: FirebaseAuth.instance,
           firebaseStorage: firebaseStorage, 
           sharedPreferences: prefs),
-        ), 
+        ),
+        //permisos de camara y galeria.
+        ChangeNotifierProvider<PermissionsProvider>(
+          create: (context) => PermissionsProvider(),
+        ) 
       ], 
       child: MaterialApp(
         debugShowCheckedModeBanner: false,

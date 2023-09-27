@@ -6,12 +6,12 @@ enum Type {
 }
 
 class MessageModel {
-    final String msg;
-    final String read;
-    final String told;
-    final String type;
-    final String fromId;
-    final String sent;
+    late final String msg;
+    late final String read;
+    late final String told;
+    late final String type;
+    late final String fromId;
+    late final String sent;
 
     MessageModel({
         required this.msg,
@@ -26,14 +26,14 @@ class MessageModel {
 
     String toRawJson() => json.encode(toJson());
 
-    factory MessageModel.fromJson(Map<String, dynamic> json) => MessageModel(
-        msg: json["msg"] ?? '',
-        read: json["read"] ?? '',
-        told: json["told"] ?? '',
-        type: json["type"] ?? Type.text, // el tipo se refiere al objeto imagen.
-        fromId: json["fromId"] ?? '',
-        sent: json["sent"] ?? '',
-    );
+    MessageModel.fromJson(Map<String, dynamic> json){
+        msg = json["msg"].toString();
+        read =  json["read"].toString();
+        told = json["told"].toString() ;
+        type = json["type"].toString() == "image" ? 'image' : 'text';
+        fromId = json["fromId"].toString();
+        sent = json["sent"].toString() ;
+    }
 
     Map<String, dynamic> toJson() => {
         "msg": msg,
