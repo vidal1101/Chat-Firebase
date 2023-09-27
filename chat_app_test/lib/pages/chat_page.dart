@@ -34,6 +34,9 @@ class _ChatPageState extends State<ChatPage> {
   TextEditingController textEditingController = TextEditingController();
   bool isShowEmoji = false;
 
+  ScrollController _scrollController = ScrollController();
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -70,16 +73,23 @@ class _ChatPageState extends State<ChatPage> {
             
                       listMessages = data.map((e) => MessageModel.fromJson( e.data() as Map<String, dynamic>)  ).toList() ?? [];
             
+
               
                       if(listMessages.isNotEmpty){
+                        WidgetsBinding.instance.addPostFrameCallback((_) {
+                          _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
+                        });
+
                         return ListView.builder(
+                          controller: _scrollController,
+                          reverse: false, 
                           physics:const  BouncingScrollPhysics(),
                           itemCount: listMessages.length,
                           itemBuilder: (BuildContext context, int index) {
                             return  MessageCard(  messageModel:  listMessages[index],); 
                           },
                         );
-              
+                        
                       }else{
                         return const Center(child: Text('No hay mensajes.' , style: TextStyle(fontSize: 17),));
                       }
@@ -168,8 +178,10 @@ class _ChatPageState extends State<ChatPage> {
               //emoji button
               IconButton(onPressed: () {
                 setState(() => isShowEmoji = !isShowEmoji );
-              },
-               icon: const Icon(Icons.emoji_emotions_rounded, color: Colors.blueAccent,)), 
+                },
+                icon: (isShowEmoji) ?  const Icon(Icons.emoji_emotions_rounded, color: Colors.blue,) 
+                  : const Icon(Icons.emoji_emotions_outlined, color: Colors.blueAccent,),
+              ), 
 
                //espacio para escribir 
                Expanded(
