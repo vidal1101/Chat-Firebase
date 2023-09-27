@@ -56,12 +56,10 @@ class _MessageCardState extends State<MessageCard> {
             ),
             child: widget.messageModel.type == 'image' 
               ? ClipRRect(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(15),
                 child: CachedNetworkImage(
                   imageUrl: widget.messageModel.msg,
-                  imageBuilder: (context, imageProvider) => CircleAvatar(
-                    backgroundImage: imageProvider,
-                  ),
+                  fit: BoxFit.fill,
                   placeholder: (context, url) => const Center(child: Icon(Icons.image)), // Puedes personalizar el placeholder
                   errorWidget: (context, url, error) => const Icon(Icons.error), // Puedes personalizar el widget de error
                 ),
