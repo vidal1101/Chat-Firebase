@@ -6,6 +6,7 @@ import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/models/user_chat.dart';
 import 'package:chat_app_test/providers/custom_notification.dart';
+import 'package:chat_app_test/request/fcm_notification.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -292,7 +293,10 @@ class AuthProviders extends ChangeNotifier {
     );
 
     final ref = firebaseFirestore.collection("chats/${getConversationID(chatUserModel.id)}/messages/");
-    await ref.doc(time).set(messageModel.toJson());
+    await ref.doc(time).set(messageModel.toJson()).then((value) async{
+      //enviar la notificacion al otro usuario remitente. 
+      await FcmNotificationRequest().sendNotification(chatUserModel: chatUserModel, msg: msgs);
+    });
 
   }
 
