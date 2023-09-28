@@ -1,13 +1,12 @@
 
 import 'dart:io';
-import 'dart:math';
 
 import 'package:chat_app_test/helper/constanst.dart';
 import 'package:chat_app_test/models/chat_user_model.dart';
 import 'package:chat_app_test/models/message_model.dart';
 import 'package:chat_app_test/models/user_chat.dart';
+import 'package:chat_app_test/providers/custom_notification.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
@@ -88,6 +87,13 @@ class AuthProviders extends ChangeNotifier {
     return false;
   }
 
+  //obtener el otoken del dispositivo despues de iniciar la app,
+  // y setearlo al hacer login o registrar al usuario
+  Future<void> getFirebaseMessagingToken()async{
+    if(PushNotificationService.token != null ){
+      userCurrentInfo.pushToken = PushNotificationService.token!;
+    }
+  }
 
   ///cerrar la session actual del usuario
   Future<void> handlesingOut()async{
@@ -115,11 +121,26 @@ class AuthProviders extends ChangeNotifier {
     .doc(firebaseUserCurrent!.uid).get().then((user)async{
       if(user.exists){
         _userCurrentInfo = ChatUserModel.fromJson(user.data()!);
+        await getFirebaseMessagingToken(); //setear el token del dispositivo. realizar un update.
+        ///
+        await updateActiveStatus(true);
         _enumLoadUser = EnumLoadUser.load;
         notifyListeners();
       }else{
         await handleSignIn().then((value) => getSelfInfo());
       }
+    });
+  }
+
+  //cambiar el status del token y estado activo.
+  Future<void> updateActiveStatus(bool isOnline)async{
+    final time = DateTime.now().millisecondsSinceEpoch.toString();
+
+    await firebaseFirestore.collection(FirestoneConstants.pathUsercolection)
+    .doc(firebaseUserCurrent!.uid).update({
+      FirestoneConstants.isOnline : isOnline, 
+      FirestoneConstants.lastActive : time, 
+      FirestoneConstants.pushToken : userCurrentInfo.pushToken, 
     });
   }
 
@@ -160,6 +181,10 @@ class AuthProviders extends ChangeNotifier {
 
 
           final time = DateTime.now().millisecondsSinceEpoch.toString();
+
+          //obtener el token y asignarlo 
+          //await getFirebaseMessagingToken();
+
           //crear el usuario a nivel de firabase.
           FirebaseFirestore.instance.collection(FirestoneConstants.pathUsercolection).doc(firebaseUser.uid).set({
             FirestoneConstants.nickName : firebaseUser.displayName, 
@@ -314,6 +339,4 @@ class AuthProviders extends ChangeNotifier {
 
   }
   
-
-
 }

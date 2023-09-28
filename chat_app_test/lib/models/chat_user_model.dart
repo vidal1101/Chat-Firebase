@@ -2,14 +2,14 @@ import 'dart:convert';
 
 //modelo para mostrar los usuarios actual de la base de datos firebase 
 class ChatUserModel {
-    final String photoUrl;
-    final String createdAt;
-    final String lastActive;
-    final String nickname;
-    final bool isOnline;
-    final String id;
-    final String pushToken;
-    final dynamic chattingWith;
+    late String photoUrl;
+    late String createdAt;
+    late String lastActive;
+    late String nickname;
+    late bool isOnline;
+    late String id;
+    late String pushToken;
+    late dynamic chattingWith;
     
 
     ChatUserModel({
