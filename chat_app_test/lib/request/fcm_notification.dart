@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:chat_app_test/models/chat_user_model.dart';
+import 'package:chat_app_test/providers/auth_provider.dart';
 import 'package:http/http.dart' as http;
 
 
@@ -22,16 +23,24 @@ class FcmNotificationRequest {
   Future<void> sendNotification({
     required ChatUserModel chatUserModel, 
     required String msg,
+    required String idUserMe
   })async{
     //body de la request.
+    
    try {
 
     final body = {
         "to": chatUserModel.pushToken, 
         "notification": {
           "title" : chatUserModel.nickname,
-          "body" : msg,
-        }
+          "body" : msg == "imagen" ? "Envio Imagen" : msg,
+          "android_channel_id": "chats"
+        }, 
+        "data": {
+          "some_data" : "User ID: $idUserMe",
+        },
+        "priority": "high",
+        "content_available": true,
     };
 
     final response = await http.post(

@@ -1,7 +1,9 @@
 
 import 'package:chat_app_test/pages/pages.dart';
 import 'package:chat_app_test/providers/auth_provider.dart';
+import 'package:chat_app_test/providers/custom_notification.dart';
 import 'package:chat_app_test/providers/permission_providers.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -25,6 +27,7 @@ class _SplashPageState extends State<SplashPage> {
   }
 
 
+  //obtener permisos de notificaciones, camara, galeria.
   Future<void> getAllPermission()async{
     //permisos de camara.
     final permissionsProvider = Provider.of<PermissionsProvider>(context,listen: false);
@@ -37,7 +40,20 @@ class _SplashPageState extends State<SplashPage> {
     await permissionsProvider.requestPermissionPhotos().then((value) {
       print("permisos de galeria: ${permissionsProvider.galleryPermissionStatus}");
     });
-    
+
+    //permisos de notificaciones
+    NotificationSettings settings = await PushNotificationService.messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    print(settings);
+ 
   }
 
 

@@ -40,6 +40,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_local_notifications: ^9.0.0
+  flutter_notification_channel: ^2.0.0
   fluttertoast: ^8.0.8
   google_api_availability: ^5.0.0
   google_sign_in: ^6.1.5

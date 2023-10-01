@@ -221,14 +221,15 @@ class _ChatPageState extends State<ChatPage> {
             if(textEditingController.text.isEmpty) return;
 
             final authProviders = Provider.of<AuthProviders>(context, listen: false);
+            final mensajTem = textEditingController.text;
+            textEditingController.text = "";
 
             await authProviders.sendMessage(
               chatUserModel: widget.chatUserModel,
-              msgs: textEditingController.text,
+              msgs: mensajTem,
               type: 'text'
             );
 
-            textEditingController.text = '';
 
 
           },

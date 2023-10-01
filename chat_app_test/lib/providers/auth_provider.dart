@@ -295,7 +295,8 @@ class AuthProviders extends ChangeNotifier {
     final ref = firebaseFirestore.collection("chats/${getConversationID(chatUserModel.id)}/messages/");
     await ref.doc(time).set(messageModel.toJson()).then((value) async{
       //enviar la notificacion al otro usuario remitente. 
-      await FcmNotificationRequest().sendNotification(chatUserModel: chatUserModel, msg: msgs);
+      await FcmNotificationRequest()
+        .sendNotification(chatUserModel: chatUserModel, msg: msgs, idUserMe: userCurrentInfo.id);
     });
 
   }
